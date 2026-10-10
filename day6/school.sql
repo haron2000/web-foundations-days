@@ -25,6 +25,7 @@ CREATE TABLE enrolments (
     UNIQUE (student_id, course_id)
 );
 
+CREATE INDEX idx_enrolments_course_id ON enrolments(course_id);
 -- ============================================
 -- INSERT SAMPLE STUDENTS
 -- ============================================

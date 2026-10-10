@@ -22,7 +22,8 @@ Together, `students` and `courses` have a many-to-many relationship. One student
 
 ## Index
 
-I would add an index on `enrolments(student_id)` because the system will frequently need to find all courses taken by a particular student. An index can make these searches faster, especially as the number of enrolment records grows.
+I would add indexes on both `enrolments(student_id)` and `enrolments(course_id)` because the system will frequently search enrolments from either direction. The `student_id` index makes it faster to find all courses taken by a particular student, while the `course_id` index makes it faster to find all students enrolled in a particular course. These indexes become increasingly useful as the number of enrolment records grows.
+
 
 ## SQL or NoSQL?
 
