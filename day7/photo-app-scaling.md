@@ -112,75 +112,58 @@ Object storage is better suited to storing hundreds of terabytes of media files 
 
 ## 5. Architecture Diagram
 
+The proposed SnapShare architecture can be represented using the following text-based diagram:
+
 ```text
-                              ┌──────────────┐
-                              │    Users     │
-                              └──────┬───────┘
-                                     │
-                                     ▼
-                              ┌──────────────┐
-                              │     CDN      │
-                              └──────┬───────┘
-                                     │
-                                     ▼
-                            ┌─────────────────┐
-                            │  Load Balancer  │
-                            └────────┬────────┘
-                                     │
-                    ┌────────────────┼────────────────┐
-                    │                │                │
-                    ▼                ▼                ▼
-              ┌──────────┐     ┌──────────┐     ┌──────────┐
-              │ App      │     │ App      │     │ App      │
-              │ Server 1 │     │ Server 2 │     │ Server 3 │
-              └────┬─────┘     └────┬─────┘     └────┬─────┘
-                   │                │                │
-                   └────────────────┼────────────────┘
-                                    │
-                    ┌───────────────┼────────────────┐
-                    │                                │
-                    ▼                                ▼
-              ┌───────────┐                  ┌──────────────┐
-              │   Cache   │                  │   Database   │
-              └───────────┘                  │   Primary    │
-                                             └──────┬───────┘
-                                                    │
-                                                    ▼
-                                             ┌──────────────┐
-                                             │ Read Replica │
-                                             └──────────────┘
-
-
-                         PHOTO UPLOAD FLOW
-                                │
-                                ▼
-                         ┌──────────────┐
-                         │ App Server   │
-                         └──────┬───────┘
-                                │
-                    ┌───────────┴───────────┐
-                    │                       │
-                    ▼                       ▼
-             ┌───────────────┐       ┌──────────────┐
-             │ Object Storage│       │     Queue    │
-             │ Original Photo│       │ Thumbnail Job│
-             └───────┬───────┘       └──────┬───────┘
-                     │                       │
-                     │                       ▼
-                     │                ┌──────────────┐
-                     │                │    Worker    │
-                     │                └──────┬───────┘
-                     │                       │
-                     │                       ▼
-                     │                ┌───────────────┐
-                     └───────────────►│Object Storage │
-                                      │   Thumbnail   │
-                                      └───────────────┘
+Users
+  |
+  v
+CDN
+  |
+  v
+Load Balancer
+  |
+  v
+Multiple App Servers
+  |
+  +----> Cache
+  |
+  +----> Primary Database ----> Read Replica
+  |
+  +----> Object Storage
+  |
+  +----> Queue ----> Worker ----> Object Storage
 ```
 
-The upload flow is separated from thumbnail processing so the user does not have to wait for the background image-processing job to finish.
+### Photo Upload Flow
 
----
+```text
+User
+  |
+  v
+Load Balancer
+  |
+  v
+App Server
+  |
+  +----> Store Original Photo in Object Storage
+  |
+  +----> Save Photo Metadata in Primary Database
+  |
+  +----> Send Thumbnail Job to Queue
+              |
+              v
+            Worker
+              |
+              v
+       Generate Thumbnail
+              |
+              v
+       Object Storage
+       (Thumbnail)
+```
+
+The CDN delivers frequently requested photos and thumbnails, while the load balancer distributes requests across multiple application servers. The cache reduces repeated database queries, and the read replica handles additional database read traffic. Object storage holds the original photos and thumbnails. The queue and worker handle thumbnail generation asynchronously so that image processing does not block the main upload request.
 
 ## 6. Component Responsibilities
 
