@@ -1,0 +1,7 @@
+# Day 8 Reflection
+
+The most difficult concept in this course was system architecture and understanding how different components work together to solve specific problems. At first, it was easy to list components such as load balancers, caches, databases, and queues, but it was more difficult to understand why each component was necessary. I overcame this by starting with a simple design and asking what would break as the number of users and requests increased. The estimates helped me identify the bottleneck and choose components based on actual problems rather than adding them unnecessarily.
+
+The part of my capstone I would improve is the architecture and scaling design. I would improve the handling of extremely high traffic during a popular ticket sale by doing more detailed load testing and designing the waiting-room mechanism in greater depth. I would also explore better monitoring so that the system could detect database contention, cache performance, and application-server failures in real time. The feedback from the earlier projects helped me understand that every component in an architecture should have a clear purpose and that trade-offs should be explained rather than hidden.
+
+Next, I want to learn how to build a real backend using Node.js and Express and connect it to PostgreSQL. I also want to learn more about authentication, transactions, caching with Redis, and deploying applications to the cloud. This would help me move from designing systems on paper to building and testing the systems I design.
